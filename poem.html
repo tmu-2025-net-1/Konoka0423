@@ -1,155 +1,83 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>詩の重力アニメーション - スマホ対応</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      background: #fdfdfd;
-      overflow: hidden;
-    }
-
-    #container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    .char {
-      position: absolute;
-      font-size: 2em;
-      font-family: 'serif';
-      user-select: none;
-      pointer-events: none;
-      color: #333;
-    }
-
-    #hint {
-      position: absolute;
-      bottom: 10px;
-      width: 100%;
-      text-align: center;
-      font-size: 1em;
-      color: #999;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>傾きで「あいうえお」表示</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            background: #fdfdfd;
+            overflow: hidden;
+        }
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        .char {
+            position: absolute;
+            font-size: 2em;
+            font-family: 'serif';
+            user-select: none;
+            pointer-events: none;
+            color: #333;
+            left: 50%;
+            top: 40%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        #hint {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 1em;
+            color: #999;
+        }
+    </style>
 </head>
 <body>
-  <div id="container"></div>
-  <div id="hint">スマホを右に傾けてください</div>
+    <div id="container">
+        <span id="aiueo" class="char">あいうえお</span>
+    </div>
+    <div id="hint">スマホをタップして許可してください</div>
+    <script>
+    const threshold = 30;
+    let shown = false;
 
-  <script>
-    const lines = [
-      "君を待つことが、僕を生かしていた",
-      "それは終わりではなく、始まりだった",
-      "見えない場所でまた巡り会える",
-      "僕は信じていた",
-      "君がいると",
-      "遥か遠くの空に浮かぶ星も",
-      "静かに瞬き、導きをくれる",
-      "何度も巡った季節の狭間で",
-      "僕らは確かに繋がっている",
-      "光を信じて、歩き続ける"
-    ];
-
-    const container = document.getElementById("container");
-    const gravity = 0.6;
-    const threshold = 30; // 右に30度以上傾いたら進行
-    let lastTriggered = 0;
-    let lineIndex = -1;
-    let fallingChars = [];
-
-    function showNextLine() {
-      if (lineIndex >= 0) {
-        // 既存の文字を下に落とす
-        fallingChars.forEach(char => {
-          char.vy = 2 + Math.random() * 2;
-          char.grounded = false;
-        });
-      }
-
-      lineIndex++;
-      if (lineIndex >= lines.length) return;
-
-      const text = lines[lineIndex];
-      fallingChars = [];
-
-      for (let i = 0; i < text.length; i++) {
-        const span = document.createElement("span");
-        span.textContent = text[i];
-        span.className = "char";
-        const x = window.innerWidth / 2 - (text.length * 20) / 2 + i * 20;
-        span.style.left = `${x}px`;
-        span.style.top = `-40px`;
-        container.appendChild(span);
-
-        fallingChars.push({
-          el: span,
-          x: x,
-          y: -40,
-          vy: Math.random() * 1.5,
-          grounded: false
-        });
-      }
-    }
-
-    function animate() {
-      fallingChars.forEach(char => {
-        if (!char.grounded) {
-          char.vy += gravity;
-          char.y += char.vy;
-
-          if (char.y > window.innerHeight / 2) {
-            char.y = window.innerHeight / 2;
-            char.vy = 0;
-            char.grounded = true;
-          }
-
-          char.el.style.top = `${char.y}px`;
-        } else {
-          // 落とす時
-          if (char.vy > 0) {
-            char.y += char.vy;
-            char.vy += gravity;
-            char.el.style.top = `${char.y}px`;
-
-            if (char.y > window.innerHeight) {
-              char.el.remove();
-            }
-          }
+    function deviceorientationHandler(e) {
+        const gamma = e.gamma;
+        if (gamma > threshold && !shown) {
+            document.getElementById("aiueo").style.opacity = 1;
+            shown = true;
         }
-      });
-
-      requestAnimationFrame(animate);
     }
 
-    animate();
-
-    // スマホの傾き取得
-    window.addEventListener("deviceorientation", (e) => {
-      const gamma = e.gamma;
-
-      const now = Date.now();
-      if (gamma > threshold && now - lastTriggered > 800) {
-        showNextLine();
-        lastTriggered = now;
-      }
-    });
-
-    // iOS用：ユーザー操作後にセンサー許可を求める
-    document.body.addEventListener("click", () => {
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-          .then(response => {
-            if (response === 'granted') {
-              document.getElementById('hint').textContent = '右に傾けて詩を読み進めてください';
+    document.body.addEventListener('click', async function init() {
+        const hint = document.getElementById('hint');
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const response = await DeviceOrientationEvent.requestPermission();
+                if (response === 'granted') {
+                    hint.textContent = '右に傾けて「あいうえお」を表示します';
+                    window.addEventListener('deviceorientation', deviceorientationHandler);
+                } else {
+                    hint.textContent = '許可が得られませんでした';
+                }
+            } catch (err) {
+                console.error(err);
+                hint.textContent = 'エラーが発生しました';
             }
-          })
-          .catch(console.error);
-      }
+        } else {
+            hint.textContent = '右に傾けて「あいうえお」を表示します';
+            window.addEventListener('deviceorientation', deviceorientationHandler);
+        }
+
+        document.body.removeEventListener('click', init);
     });
-  </script>
+</script>
+
 </body>
 </html>
