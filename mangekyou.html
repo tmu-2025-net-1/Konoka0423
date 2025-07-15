@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>正確な鏡面対称タイポ万華鏡</title>
+  <style>
+    body {
+      margin: 0;
+      background: #fffdf8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    svg {
+      width: 80vmin;
+      height: 80vmin;
+    }
+
+    text {
+      font-size: 28px;
+      font-family: "Yu Mincho", "Hiragino Mincho Pro", serif;
+      fill: #c62626;
+      writing-mode: vertical-rl;
+      transform-origin: center;
+    }
+  </style>
+</head>
+<body>
+  <svg viewBox="-200 -200 400 400">
+    <!-- 通常の「なつ」 -->
+    <g id="section">
+      <text x="0" y="-90">なつ
+      </text>
+    </g>
+
+    <!-- 交互に鏡面反転を加えた配置 -->
+    <!-- 通常 -->
+    <use href="#section" transform="rotate(0)" />
+    <!-- 鏡面：回転 → 反転（Y軸） → 位置修正 -->
+    <use href="#section" transform="rotate(60) scale(-1,1)" />
+    <use href="#section" transform="rotate(120)" />
+    <use href="#section" transform="rotate(180) scale(-1,1)" />
+    <use href="#section" transform="rotate(240)" />
+    <use href="#section" transform="rotate(300) scale(-1,1)" />
+  </svg>
+</body>
+</html>
+
+
