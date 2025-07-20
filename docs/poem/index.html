@@ -2,23 +2,25 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8" />
-    <title>傾きで「あいうえお」表示</title>
+    <title>詩</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             margin: 0;
             background: #fdfdfd;
             overflow: hidden;
+            font-family: 'serif';
         }
+
         #container {
             position: relative;
             width: 100vw;
             height: 100vh;
         }
+
         .char {
             position: absolute;
             font-size: 2em;
-            font-family: 'serif';
             user-select: none;
             pointer-events: none;
             color: #333;
@@ -28,21 +30,25 @@
             opacity: 0;
             transition: opacity 0.5s;
         }
+
         #hint {
             position: absolute;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            font-size: 1em;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2em;
             color: #999;
+            text-align: center;
+            transition: opacity 0.5s;
         }
     </style>
 </head>
 <body>
     <div id="container">
-        <span id="aiueo" class="char">あいうえお</span>
+        <span id="first" class="char">僕の心に</span>
     </div>
-    <div id="hint">スマホをタップして許可してください</div>
+    <div id="hint">画面をタップして傾きを許可してください</div>
+
     <script>
     const threshold = 30;
     let shown = false;
@@ -50,34 +56,39 @@
     function deviceorientationHandler(e) {
         const gamma = e.gamma;
         if (gamma > threshold && !shown) {
-            document.getElementById("aiueo").style.opacity = 1;
+            document.getElementById("first").style.opacity = 1;
             shown = true;
         }
     }
 
-    document.body.addEventListener('click', async function init() {
+    async function requestPermissionFlow() {
         const hint = document.getElementById('hint');
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
             try {
                 const response = await DeviceOrientationEvent.requestPermission();
                 if (response === 'granted') {
-                    hint.textContent = '右に傾けて「あいうえお」を表示します';
+                    hint.textContent = '← →';
                     window.addEventListener('deviceorientation', deviceorientationHandler);
                 } else {
-                    hint.textContent = '許可が得られませんでした';
+                    hint.textContent = 'ジャイロの許可が得られませんでした';
                 }
             } catch (err) {
                 console.error(err);
                 hint.textContent = 'エラーが発生しました';
             }
         } else {
-            hint.textContent = '右に傾けて「あいうえお」を表示します';
+            hint.textContent = '← →';
             window.addEventListener('deviceorientation', deviceorientationHandler);
         }
+    }
 
-        document.body.removeEventListener('click', init);
+    document.addEventListener('DOMContentLoaded', () => {
+        document.body.addEventListener('click', async function init() {
+            await requestPermissionFlow();
+            document.body.removeEventListener('click', init);
+        });
     });
-</script>
-
+    </script>
 </body>
 </html>
+
