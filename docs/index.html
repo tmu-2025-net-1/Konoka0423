@@ -24,14 +24,20 @@
     .content{
         text-align: center;
         font-family: serif;
+        padding: 20px;
     }
     </style>
 </head>
 <body>
     <div class="content">
-        <div class ="center-text">タイトル</div>
-        <a href="rule/index.html">詩を読む</a>
-        <P>＊このサイトはスマホでお楽しみください</P>
+        <div class ="center-text">回詩</div>
+        <p>画面をタップ</p>
     </div>
+     
+    <script>
+    document.body.addEventListener('click', function() {
+        window.location.href = 'rule/index.html';
+    });
+    </script>
 </body>
 </html>
