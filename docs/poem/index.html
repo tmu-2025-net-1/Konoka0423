@@ -1,117 +1,111 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8" />
-    <title>詩</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            margin: 0;
-            background: #fdfdfd;
-            overflow: hidden;
-            font-family: 'serif';
-        }
-
-        #container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
-
-        .char {
-            position: absolute;
-            font-size: 2em;
-            user-select: none;
-            pointer-events: none;
-            color: #333;
-            left: 50%;
-            top: 40%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        #hint {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.2em;
-            color: #999;
-            text-align: center;
-            transition: opacity 0.5s;
-        }
-    </style>
+<meta charset="UTF-8" />
+<title>左右の360度傾きで文章切替</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+    body {
+        margin: 0;
+        background: #fdfdfd;
+        overflow: hidden;
+        font-family: 'serif';
+    }
+    #container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+    }
+    .char {
+        position: absolute;
+        font-size: 2em;
+        user-select: none;
+        pointer-events: none;
+        color: #333;
+        left: 50%;
+        top: 40%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+    #hint {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.2em;
+        color: #999;
+        text-align: center;
+        transition: opacity 0.5s;
+    }
+</style>
 </head>
 <body>
-    <div id="container">
-        <span id="text0" class="char" style="opacity:0;">文章0：はじめの詩</span>
-        <span id="text1" class="char" style="opacity:0;">文章1：僕の心に</span>
-        <span id="text2" class="char" style="opacity:0;">文章2：新たな決意を</span>
-        <span id="text3" class="char" style="opacity:0;">文章3：握りしめた</span>
-        <!-- 必要に応じて増やす -->
-    </div>
-    <div id="hint">画面をタップして傾きを許可してください</div>
+<div id="container">
+    <span id="text0" class="char">文章0</span>
+    <span id="text1" class="char">文章1</span>
+    <span id="text2" class="char">文章2</span>
+    <span id="text3" class="char">文章3</span>
+    <span id="text4" class="char">文章4</span>
+    <span id="text5" class="char">文章5</span>
+    <span id="text6" class="char">文章6</span>
+    <span id="text7" class="char">文章7</span>
+    <span id="text8" class="char">文章8</span>
+    <span id="text9" class="char">文章9</span>
+    <span id="text10" class="char">文章10</span>
+    <span id="text11" class="char">文章11</span>
+</div>
+<div id="hint">画面をタップして傾きを許可してください</div>
 
-    <script>
-    const step = 30; // 30度刻み
-const maxIndex = 3; // 表示する文章数 - 1
-let currentIndex = -1; // 今表示中の文章番号（-1は何も表示なし）
+<script>
+const step = 30; // 30度刻み
+const maxIndex = 11;
+let currentIndex = -1;
 
 function deviceorientationHandler(e) {
-    let gamma = e.gamma;
+    let alpha = e.alpha; // 0〜360度、端末の回転方向
 
-    // gammaがマイナスの場合は0にするか、別途対応する場合は調整してください
-    if (gamma < 0) gamma = 0;
+    if (alpha === null) return; // nullチェック
 
-    // 表示すべきインデックスを計算（30度ごとに1ずつ増える）
-    const index = Math.min(Math.floor(gamma / step), maxIndex);
+    // 30度刻みのインデックス算出
+    const index = Math.min(Math.floor(alpha / step), maxIndex);
 
     if (index !== currentIndex) {
-        // 表示切り替えが必要なら行う
         if (currentIndex >= 0) {
-            // 現在の文章を非表示に
             document.getElementById(`text${currentIndex}`).style.opacity = 0;
         }
-
-        if (index >= 0) {
-            // 新しい文章を表示
-            document.getElementById(`text${index}`).style.opacity = 1;
-        }
-
+        document.getElementById(`text${index}`).style.opacity = 1;
         currentIndex = index;
     }
 }
 
-
-    async function requestPermissionFlow() {
-        const hint = document.getElementById('hint');
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-            try {
-                const response = await DeviceOrientationEvent.requestPermission();
-                if (response === 'granted') {
-                    hint.textContent = '← →';
-                    window.addEventListener('deviceorientation', deviceorientationHandler);
-                } else {
-                    hint.textContent = 'ジャイロの許可が得られませんでした';
-                }
-            } catch (err) {
-                console.error(err);
-                hint.textContent = 'エラーが発生しました';
+async function requestPermissionFlow() {
+    const hint = document.getElementById('hint');
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        try {
+            const response = await DeviceOrientationEvent.requestPermission();
+            if (response === 'granted') {
+                hint.textContent = '端末を回転させて文章を切り替えます';
+                window.addEventListener('deviceorientation', deviceorientationHandler);
+            } else {
+                hint.textContent = 'ジャイロの許可が得られませんでした';
             }
-        } else {
-            hint.textContent = '← →';
-            window.addEventListener('deviceorientation', deviceorientationHandler);
+        } catch (err) {
+            console.error(err);
+            hint.textContent = 'エラーが発生しました';
         }
+    } else {
+        hint.textContent = '端末を回転させて文章を切り替えます';
+        window.addEventListener('deviceorientation', deviceorientationHandler);
     }
+}
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.body.addEventListener('click', async function init() {
-            await requestPermissionFlow();
-            document.body.removeEventListener('click', init);
-        });
+document.addEventListener('DOMContentLoaded', () => {
+    document.body.addEventListener('click', async function init() {
+        await requestPermissionFlow();
+        document.body.removeEventListener('click', init);
     });
-    </script>
+});
+</script>
 </body>
 </html>
-
