@@ -1,117 +1,117 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>回転詩</title>
-<style>
-  body {
-    margin: 0; 
-    font-family: serif; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    height: 100vh; 
-    background: #fdfdfd;
-  }
-  #poem-container {
-    position: relative; 
-    width: 80vw; 
-    max-width: 400px; 
-    height: 5em; 
-    overflow: hidden;
-  }
-  .line {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    font-size: 2em;
-    opacity: 0;
-    transition: opacity 0.7s ease;
-  }
-  .line.active {
-    opacity: 1;
-  }
-</style>
+    <meta charset="UTF-8" />
+    <title>詩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            background: #fdfdfd;
+            overflow: hidden;
+            font-family: 'serif';
+        }
+
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .char {
+            position: absolute;
+            font-size: 2em;
+            user-select: none;
+            pointer-events: none;
+            color: #333;
+            left: 50%;
+            top: 40%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        #hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2em;
+            color: #999;
+            text-align: center;
+            transition: opacity 0.5s;
+        }
+    </style>
 </head>
 <body>
+    <div id="container">
+        <span id="text0" class="char" style="opacity:0;">文章0：はじめの詩</span>
+        <span id="text1" class="char" style="opacity:0;">文章1：僕の心に</span>
+        <span id="text2" class="char" style="opacity:0;">文章2：新たな決意を</span>
+        <span id="text3" class="char" style="opacity:0;">文章3：握りしめた</span>
+        <!-- 必要に応じて増やす -->
+    </div>
+    <div id="hint">画面をタップして傾きを許可してください</div>
 
-<div id="poem-container">
-  <!-- JSでここに文章を入れていく -->
-</div>
+    <script>
+    const step = 30; // 30度刻み
+const maxIndex = 3; // 表示する文章数 - 1
+let currentIndex = -1; // 今表示中の文章番号（-1は何も表示なし）
 
-<script>
-  const lines = [
-    "僕の心に",
-    "新たな決意を",
-    "握りしめた",
-    "小さく震える手を",
-    "ふって、ぼくは歩き出すことにした",
-    "一緒に居た笑顔の君を",
-    "まちつづけたぼく。ずっと",
-    "幸せをねがって",
-    "バカみたいだ",
-    "もう一度君に会いたい。",
-    "届かない思い。"
-  ];
+function deviceorientationHandler(e) {
+    let gamma = e.gamma;
 
-  const container = document.getElementById('poem-container');
-  let currentIndex = 0;
+    // gammaがマイナスの場合は0にするか、別途対応する場合は調整してください
+    if (gamma < 0) gamma = 0;
 
-  // 文章をDOMに作る
-  lines.forEach((text, i) => {
-    const div = document.createElement('div');
-    div.classList.add('line');
-    if(i === 0) div.classList.add('active');
-    div.textContent = text;
-    container.appendChild(div);
-  });
+    // 表示すべきインデックスを計算（30度ごとに1ずつ増える）
+    const index = Math.min(Math.floor(gamma / step), maxIndex);
 
-  const lineElements = container.querySelectorAll('.line');
-
-  // 回転角度に応じて行を切り替える関数
-  function updateLineByRotation(angle) {
-    // angleを0-360に正規化
-    let normAngle = angle % 360;
-    if (normAngle < 0) normAngle += 360;
-
-    // 30度ごとに区切ってインデックス決定（0~11）だが行数は11なので上限処理
-    let idx = Math.floor(normAngle / 30);
-    if(idx >= lines.length) idx = lines.length - 1;
-
-    if (idx !== currentIndex) {
-      lineElements[currentIndex].classList.remove('active');
-      lineElements[idx].classList.add('active');
-      currentIndex = idx;
-    }
-  }
-
-  // センサーの許可とイベント登録
-  async function requestPermissionAndListen() {
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-      try {
-        const res = await DeviceOrientationEvent.requestPermission();
-        if (res === 'granted') {
-          window.addEventListener('deviceorientation', e => {
-            updateLineByRotation(e.alpha || 0);
-          });
-        } else {
-          alert('ジャイロセンサーの許可が必要です');
+    if (index !== currentIndex) {
+        // 表示切り替えが必要なら行う
+        if (currentIndex >= 0) {
+            // 現在の文章を非表示に
+            document.getElementById(`text${currentIndex}`).style.opacity = 0;
         }
-      } catch(e) {
-        alert('許可取得エラー');
-      }
-    } else {
-      window.addEventListener('deviceorientation', e => {
-        updateLineByRotation(e.alpha || 0);
-      });
+
+        if (index >= 0) {
+            // 新しい文章を表示
+            document.getElementById(`text${index}`).style.opacity = 1;
+        }
+
+        currentIndex = index;
     }
-  }
+}
 
-  document.body.addEventListener('click', () => {
-    requestPermissionAndListen();
-  }, { once: true });
-</script>
 
+    async function requestPermissionFlow() {
+        const hint = document.getElementById('hint');
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const response = await DeviceOrientationEvent.requestPermission();
+                if (response === 'granted') {
+                    hint.textContent = '← →';
+                    window.addEventListener('deviceorientation', deviceorientationHandler);
+                } else {
+                    hint.textContent = 'ジャイロの許可が得られませんでした';
+                }
+            } catch (err) {
+                console.error(err);
+                hint.textContent = 'エラーが発生しました';
+            }
+        } else {
+            hint.textContent = '← →';
+            window.addEventListener('deviceorientation', deviceorientationHandler);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.body.addEventListener('click', async function init() {
+            await requestPermissionFlow();
+            document.body.removeEventListener('click', init);
+        });
+    });
+    </script>
 </body>
 </html>
+
