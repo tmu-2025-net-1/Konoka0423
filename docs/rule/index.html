@@ -17,11 +17,11 @@
             margin-top: 20px;
         }
         .subtitle {
-            font-size: 1.5em;
+            font-size: 1.4em;
             margin-top: 20px;
         }
         .ios, .android {
-            font-size: 1.2em;
+            font-size: 1.0rem;
             margin: 10px 0;
         }
         .content {
@@ -35,8 +35,26 @@
         .attenton {
             color: rgb(0, 0, 255);
             font-weight: bold;
-            margin-top: 10px;
+            padding-top: 15px;
+
         }
+        .gopoem{
+            background-color: #a6a6a6;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1.5em;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .explaination {
+            font-size: 1.0em;
+            padding-bottom: 15px;
+            padding-top: 15px;
+        }
+        
     </style>
 </head>
 <body>
@@ -46,14 +64,17 @@
         <div class="explaination">
             <p>このサイトは、スマートフォンの傾きを利用して詩を読む体験を提供します。</p>
             <p>右左どちらに回転させていっても読み進めることができます。</p>
+            <p>スマートフォンの設定でジャイロセンサーを許可してください</p>
         </div>
         <div class="subtitle">iPhone ios13未満</div>
                 <p>設定▶︎アプリ▶︎safari▶︎モーションと画面の向きのアクセスをON</p>
         <div class="subtitle">iPhone ios13以上</div>
                 <p>次のページに行くと許可を求めるポップアップが表示されるので許可してください</p>
         <div class="subtitle">Android</div>
-            <p>文章</p>
-        <a href="../poem/index.html">詩を読む</a>
+            <p>説明</p>
+        <a href="../poem/index.html">
+            <div class="gopoem">詩を読む</div>
+        </a>
     </div>
 </body>
 </html>
