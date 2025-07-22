@@ -1,43 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-    <style>
-        html, body {
-        height: 100%;
-        margin: 0;
-        }
-        body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #fff;
-        font-family: sans-serif;
-        }
-        .center-text {
-        font-size: 3rem;
-        font-weight: bold;
-        }
-    .content{
-        text-align: center;
-        font-family: serif;
-        padding: 20px;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>回詩 - タップで開始</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
     }
-    </style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+      font-family: sans-serif;
+    }
+    .content {
+      text-align: center;
+      font-family: serif;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 1.5s ease-in;
+    }
+    .content.show {
+      opacity: 1;
+    }
+    .center-text {
+      font-size: 3rem;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <div class="content">
-        <div class ="center-text">回詩</div>
-        <p>画面をタップ</p>
-    </div>
-     
-    <script>
-    document.body.addEventListener('click', function() {
-        window.location.href = 'rule/index.html';
+  <div class="content" id="mainContent">
+    <div class="center-text">回詩</div>
+    <p>画面をタップ</p>
+  </div>
+
+  <script>
+    // ページ読み込み後にフェードイン
+    window.addEventListener('load', () => {
+      document.getElementById('mainContent').classList.add('show');
     });
-    </script>
+
+    // タップでページ遷移
+    document.body.addEventListener('click', function () {
+      window.location.href = 'rule/index.html';
+    });
+  </script>
 </body>
 </html>

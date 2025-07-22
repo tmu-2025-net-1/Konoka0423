@@ -31,6 +31,11 @@
             border-radius: 16px;
             padding: 20px;
             font-family: serif;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        .content.show {
+            opacity: 1;
         }
         .attenton {
             color: rgb(0, 0, 255);
@@ -76,5 +81,10 @@
             <div class="gopoem">詩を読む</div>
         </a>
     </div>
+    <script>
+        window.addEventListener('load', () => {
+            document.querySelector('.content').classList.add('show');
+        });
+    </script>
 </body>
 </html>
