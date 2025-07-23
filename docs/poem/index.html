@@ -2,16 +2,14 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>poem</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       margin: 0;
       background: #fdfdfd;
       overflow: hidden;
       font-family: 'serif';
-      transform-origin: center center;
-      transition: transform 0.2s ease;
     }
     #container {
       position: relative;
@@ -26,9 +24,9 @@
       color: #333;
       left: 50%;
       top: 40%;
-      transform: translate(-50%, -50%) rotate(0deg);
+      transform: translate(-50%, -50%);
       opacity: 0;
-      transition: opacity 0.5s, transform 0.5s;
+      transition: opacity 0.5s;
     }
     #hint {
       position: absolute;
@@ -67,7 +65,9 @@
 
     function deviceorientationHandler(e) {
       let alpha = e.alpha;
-      if (alpha === null) return;
+      let gamma = e.gamma;
+
+      if (alpha === null || gamma === null) return;
 
       if (!hasRotated) {
         document.getElementById('hint').style.opacity = 0;
@@ -78,17 +78,17 @@
 
       if (index !== currentIndex) {
         if (currentIndex >= 0) {
-          const prev = document.getElementById(`text${currentIndex}`);
-          prev.style.opacity = 0;
-          prev.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+          document.getElementById(`text${currentIndex}`).style.opacity = 0;
         }
-
-        const current = document.getElementById(`text${index}`);
-        current.style.opacity = 1;
-        current.style.transform = `translate(-50%, -50%) rotate(${-alpha}deg)`;
-
+        document.getElementById(`text${index}`).style.opacity = 1;
         currentIndex = index;
       }
+
+      // すべての .char に対して回転補正をかける
+      const chars = document.querySelectorAll('.char');
+      chars.forEach(el => {
+        el.style.transform = `translate(-50%, -50%) rotate(${-gamma}deg)`;
+      });
     }
 
     async function requestPermissionFlow() {
