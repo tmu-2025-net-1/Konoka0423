@@ -2,121 +2,51 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>poem</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>回詩</title>
   <style>
-    body {
+    html, body {
+      height: 100%;
       margin: 0;
-      background: #fdfdfd;
-      overflow: hidden;
-      font-family: 'serif';
     }
-    #container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+      font-family: sans-serif;
     }
-    .char {
-      position: absolute;
-      font-size: 2em;
-      user-select: none;
-      pointer-events: none;
-      color: #333;
-      left: 50%;
-      top: 40%;
-      transform: translate(-50%, -50%);
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
-    #hint {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 1.2em;
-      color: #999;
+    .content {
       text-align: center;
-      transition: opacity 0.5s;
+      font-family: serif;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 1.5s ease-in;
+    }
+    .content.show {
+      opacity: 1;
+    }
+    .center-text {
+      font-size: 3rem;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div id="container">
-    <span id="text0" class="char">タイトル</span>
-    <span id="text1" class="char">僕の心に</span>
-    <span id="text2" class="char">新たな決意を</span>
-    <span id="text3" class="char">握りしめた</span>
-    <span id="text4" class="char">小さく震える手を</span>
-    <span id="text5" class="char">ふって、僕は歩き出すことにした</span>
-    <span id="text6" class="char">一緒にいた笑顔の君を</span>
-    <span id="text7" class="char">待ち続けたぼく。ずっと</span>
-    <span id="text8" class="char">幸せを願って</span>
-    <span id="text9" class="char">バカみたいだ</span>
-    <span id="text10" class="char">もう一度きみに会いたい</span>
-    <span id="text11" class="char">届かない思い。</span>
+  <div class="content" id="mainContent">
+    <div class="center-text">回詩</div>
+    <p>画面をタップ</p>
   </div>
-  <div id="hint">画面をタップして傾きを許可してください</div>
 
   <script>
-    const step = 30;
-    const maxIndex = 11;
-    let currentIndex = -1;
-    let hasRotated = false;
+    // ページ読み込み後にフェードイン
+    window.addEventListener('load', () => {
+      document.getElementById('mainContent').classList.add('show');
+    });
 
-    function deviceorientationHandler(e) {
-      let alpha = e.alpha;
-      let gamma = e.gamma;
-
-      if (alpha === null || gamma === null) return;
-
-      if (!hasRotated) {
-        document.getElementById('hint').style.opacity = 0;
-        hasRotated = true;
-      }
-
-      const index = Math.min(Math.floor(alpha / step), maxIndex);
-
-      if (index !== currentIndex) {
-        if (currentIndex >= 0) {
-          document.getElementById(`text${currentIndex}`).style.opacity = 0;
-        }
-        document.getElementById(`text${index}`).style.opacity = 1;
-        currentIndex = index;
-      }
-
-      // すべての .char に対して回転補正をかける
-      const chars = document.querySelectorAll('.char');
-      chars.forEach(el => {
-        el.style.transform = `translate(-50%, -50%) rotate(${-gamma}deg)`;
-      });
-    }
-
-    async function requestPermissionFlow() {
-      const hint = document.getElementById('hint');
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        try {
-          const response = await DeviceOrientationEvent.requestPermission();
-          if (response === 'granted') {
-            hint.textContent = '端末を回転させて文章を切り替えます';
-            window.addEventListener('deviceorientation', deviceorientationHandler);
-          } else {
-            hint.textContent = 'ジャイロの許可が得られませんでした';
-          }
-        } catch (err) {
-          console.error(err);
-          hint.textContent = 'エラーが発生しました';
-        }
-      } else {
-        hint.textContent = '端末を回転させて文章を切り替えます';
-        window.addEventListener('deviceorientation', deviceorientationHandler);
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.body.addEventListener('click', async function init() {
-        await requestPermissionFlow();
-        document.body.removeEventListener('click', init);
-      });
+    // タップでページ遷移
+    document.body.addEventListener('click', function () {
+      window.location.href = 'rule/index.html';
     });
   </script>
 </body>
